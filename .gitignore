@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Production
+dist/
+out-tsc/
+backend/dist/
+frontend/dist/
+
+# Development
+.env
+*.log
+
+# Angular
+.angular/
+
+# Testing
+coverage/
+
+# OS Files
+.DS_Store
+*.pem

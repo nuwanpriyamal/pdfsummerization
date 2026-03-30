@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 
@@ -5,10 +7,6 @@ import * as nodemailer from 'nodemailer';
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private transporter: nodemailer.Transporter;
-
-  constructor() {
-    this.initTransporter();
-  }
 
   private async initTransporter() {
     const user = process.env.SMTP_USER;
@@ -41,7 +39,7 @@ export class EmailService {
     if (!this.transporter) {
       await this.initTransporter();
     }
-    
+
     this.logger.log('Sending email...');
     const info = await this.transporter.sendMail({
       from: '"OpenClaw Agent" <agent@openclaw.local>',
@@ -52,7 +50,9 @@ export class EmailService {
     });
 
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-      this.logger.log(`Real email successfully dispatched to nuwanpriyamal@gmail.com`);
+      this.logger.log(
+        `Real email successfully dispatched to nuwanpriyamal@gmail.com`,
+      );
       return '';
     } else {
       const previewUrl = nodemailer.getTestMessageUrl(info);

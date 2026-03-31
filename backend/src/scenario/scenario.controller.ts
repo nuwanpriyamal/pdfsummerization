@@ -8,6 +8,7 @@ import {
   HttpStatus,
   UseInterceptors,
   UploadedFile,
+  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PdfService } from '../pdf/pdf.service';
@@ -62,6 +63,36 @@ export class ScenarioController {
         {
           success: false,
           error: 'Scenario failed to execute: ' + error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @Post('summarize-text')
+  async summarizeText(@Body() body: { text?: string }) {
+    this.logger.log('Triggering OpenClaw text summarization endpoint');
+    try {
+      const inputText = body?.text || '';
+      if (!inputText.trim()) {
+        throw new Error('No text provided');
+      }
+
+      const summary = await this.openclawService.summarizeText(inputText);
+      return {
+        success: true,
+        message: 'Text summarized successfully',
+        summary,
+      };
+    } catch (error: any) {
+      this.logger.error(
+        'Error during text summarization',
+        error.message || error,
+      );
+      throw new HttpException(
+        {
+          success: false,
+          error: 'Text summarization failed: ' + error.message,
         },
         HttpStatus.BAD_REQUEST,
       );

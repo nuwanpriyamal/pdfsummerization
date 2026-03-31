@@ -44,6 +44,36 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
+## OpenClaw text summarization integration
+
+Create and run the local proxy that calls the OpenClaw Gateway:
+
+```bash
+cd "../tools/summary-proxy"
+cp .env.example .env
+# edit .env and set OPENCLAW_GATEWAY_TOKEN
+npm install
+npm start
+```
+
+Configure backend environment variables:
+
+```bash
+export OPENCLAW_SUMMARY_ENDPOINT="http://localhost:8787/summarize"
+export OPENCLAW_API_KEY=""
+export OPENCLAW_TIMEOUT_MS=20000
+```
+
+Then call the text summarization route:
+
+```bash
+curl -X POST http://localhost:3000/scenario/summarize-text \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Paste any text here that should be summarized."}'
+```
+
+If the endpoint is unavailable, the backend automatically falls back to a local summarizer.
+
 ## Run tests
 
 ```bash

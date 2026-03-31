@@ -1,0 +1,21 @@
+{
+  "name": "summary-proxy",
+  "version": "1.0.0",
+  "description": "Local OpenClaw summarization proxy",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:dev": "node --watch index.js",
+    "check": "node --check index.js"
+  },
+  "keywords": [
+    "openclaw",
+    "summary",
+    "proxy"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  }
+}

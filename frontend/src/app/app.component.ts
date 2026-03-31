@@ -1,6 +1,7 @@
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 interface ScenarioResponse {
   success: boolean;
@@ -13,17 +14,21 @@ interface ScenarioResponse {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'OpenClaw Demo';
+  private readonly apiBaseUrl = 'http://localhost:3000';
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
 
-  loading = false;
+  loadingPdf = false;
+  loadingText = false;
   selectedFile: File | null = null;
+  textToSummarize = '';
+  lastAction: 'pdf' | 'text' | null = null;
   result: ScenarioResponse | null = null;
   error: string | null = null;
 
@@ -42,7 +47,8 @@ export class AppComponent {
       return;
     }
 
-    this.loading = true;
+    this.loadingPdf = true;
+    this.lastAction = 'pdf';
     this.result = null;
     this.error = null;
     this.cdr.detectChanges();
@@ -50,10 +56,10 @@ export class AppComponent {
     const formData = new FormData();
     formData.append('file', this.selectedFile);
 
-    this.http.post<ScenarioResponse>('http://localhost:3000/scenario/trigger', formData)
+    this.http.post<ScenarioResponse>(`${this.apiBaseUrl}/scenario/trigger`, formData)
       .subscribe({
         next: (resp) => {
-          this.loading = false;
+          this.loadingPdf = false;
           if (resp.success) {
             this.result = resp;
           } else {
@@ -62,10 +68,44 @@ export class AppComponent {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          this.loading = false;
+          this.loadingPdf = false;
           this.error = err.error?.error || err.message || 'Server error';
           this.cdr.detectChanges();
         }
+      });
+  }
+
+  triggerTextSummarization() {
+    if (!this.textToSummarize.trim()) {
+      this.error = 'Please enter some text to summarize.';
+      return;
+    }
+
+    this.loadingText = true;
+    this.lastAction = 'text';
+    this.result = null;
+    this.error = null;
+    this.cdr.detectChanges();
+
+    this.http
+      .post<ScenarioResponse>(`${this.apiBaseUrl}/scenario/summarize-text`, {
+        text: this.textToSummarize,
+      })
+      .subscribe({
+        next: (resp) => {
+          this.loadingText = false;
+          if (resp.success) {
+            this.result = resp;
+          } else {
+            this.error = resp.error || 'Unknown error occurred.';
+          }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.loadingText = false;
+          this.error = err.error?.error || err.message || 'Server error';
+          this.cdr.detectChanges();
+        },
       });
   }
 }

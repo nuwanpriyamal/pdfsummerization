@@ -5,7 +5,27 @@
       Demonstration of autonomous AI tasks: Upload your own PDF to extract key insights securely and generate an automated email summary for your management team.
     </p>
 
+    <div class="text-summarize-wrapper">
+      <p class="section-label">Summarize plain text</p>
+      <textarea
+        class="text-area"
+        [(ngModel)]="textToSummarize"
+        placeholder="Paste or type text to summarize with OpenClaw..."
+      ></textarea>
+
+      <button class="action-btn secondary-btn" (click)="triggerTextSummarization()" [disabled]="loadingText || !textToSummarize.trim()">
+        <ng-container *ngIf="!loadingText">
+          Summarize Text
+        </ng-container>
+        <ng-container *ngIf="loadingText">
+          <div class="loader"></div>
+          Summarizing...
+        </ng-container>
+      </button>
+    </div>
+
     <div class="file-upload-wrapper">
+      <p class="section-label">Or upload a PDF</p>
       <input type="file" id="pdfFile" accept="application/pdf" (change)="onFileSelected($event)" class="file-input">
       <label for="pdfFile" class="file-label">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -15,14 +35,14 @@
       </label>
     </div>
 
-    <button class="action-btn" (click)="triggerScenario()" [disabled]="loading || !selectedFile">
-      <ng-container *ngIf="!loading">
+    <button class="action-btn" (click)="triggerScenario()" [disabled]="loadingPdf || !selectedFile">
+      <ng-container *ngIf="!loadingPdf">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
         </svg>
         Trigger Autonomous Scenario
       </ng-container>
-      <ng-container *ngIf="loading">
+      <ng-container *ngIf="loadingPdf">
         <div class="loader"></div>
         Processing...
       </ng-container>
@@ -37,10 +57,10 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        Scenario Completed Successfully!
+        {{ lastAction === 'text' ? 'Text Summarized Successfully!' : 'Scenario Completed Successfully!' }}
       </h3>
       
-      <p style="color: #6ee7b7; margin-top: 0; margin-bottom: 1rem; font-weight: 500;">
+      <p *ngIf="lastAction === 'pdf'" style="color: #6ee7b7; margin-top: 0; margin-bottom: 1rem; font-weight: 500;">
         Success: The summary email was sent to <strong>nuwanpriyamal&#64;gmail.com</strong>.
       </p>
 
